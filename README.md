@@ -1,4 +1,4 @@
-# TP
+# TP Architecture logicielle
 ## Installation
 
 ```npm i```
@@ -9,4 +9,5 @@
 
 ## Use
 
-Will watch for files in assets/files_watcher, will read them, apply the treatments and write them to assets/files_treated and remove it from the watcher.
+Will watch for files in assets/files_watcher, read them, apply the treatments and write them to assets/files_treated and remove it from the watcher.
+Take them from assets/files and copy them in assets/files_watcher
