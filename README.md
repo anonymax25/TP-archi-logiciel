@@ -1,4 +1,5 @@
 # TP Architecture logicielle
+Maxime d'Harboullé
 ## Installation
 
 ```npm i```
