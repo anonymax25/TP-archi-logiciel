@@ -1,10 +1,7 @@
-import { rejects } from "assert"
-import { resolve } from "path"
-import { FileSystemService } from "./fileSystemService"
 import fs from "fs";
 import path from "path";
+import { FileSystemService } from "./fileSystemService"
 import { FileContent } from "../models/FileContent";
-import { Treatement } from "../interfaces/treatment.interface";
 import { AddDateTreatement } from "../treatments/addDateTreatement";
 import { ConcatMessageTreatement } from "../treatments/concatMessageTreatement";
 import { Logger, OutputMode } from "../utils/logger";
@@ -58,7 +55,7 @@ export class WatchFileService {
                     fileContent = await new ConcatMessageTreatement().treatFile(fileContent)
 
                     Logger.out(fileName + ' treated', OutputMode.NORMAL);
-                    
+
                     this.saveTreatment(fileName, fileContent)
                 })
             }
