@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs";
+import { Logger } from "../utils/logger";
 
 export class FileSystemService {
     static scanFiles(filesPath: string): Promise<string[]> {
@@ -17,7 +18,7 @@ export class FileSystemService {
     static deleteFile(filesPath: string, fileName: string) {
         fs.unlink(path.join(filesPath, fileName), function (err) {
             if (err) throw err;
-            console.log(fileName + ' removed from watcher');
+            Logger.out(fileName + ' removed from watcher');
         });
     }
 

@@ -7,6 +7,7 @@ import { FileContent } from "../models/FileContent";
 import { Treatement } from "../interfaces/treatment.interface";
 import { AddDateTreatement } from "../treatments/addDateTreatement";
 import { ConcatMessageTreatement } from "../treatments/concatMessageTreatement";
+import { Logger, OutputMode } from "../utils/logger";
 
 export class WatchFileService {
 
@@ -22,7 +23,7 @@ export class WatchFileService {
 
 
     async startWatch() {
-        console.log("start");
+        Logger.out("Start", OutputMode.PRIMARY);
         this.doWatch = true
         this.loop()
     }
@@ -31,16 +32,17 @@ export class WatchFileService {
         setTimeout(async () => { 
             const foundFileNames: string[] = await FileSystemService.scanFiles(this.filesPath)
             if(foundFileNames && foundFileNames.length > 0){
-                console.log(`- Found ${foundFileNames.length} files`);
-                await this.applyTreatements(foundFileNames)
+                Logger.out(`- Found ${foundFileNames.length} files`, OutputMode.PRIMARY);
+                try {
+                    await this.applyTreatements(foundFileNames)
+                } catch (error) {
+                    Logger.out(error.message, OutputMode.ERROR)
+                }
             } else {
-                console.log(`-`);
-
+                Logger.out(`-`,OutputMode.PRIMARY);
             }
-
             if(this.doWatch)
-                this.loop()
-            
+                this.loop()         
         }, 3000)
     }
 
@@ -49,31 +51,32 @@ export class WatchFileService {
         return new Promise((resolve, reject) => {
             for (let fileName of fileNames) {
                 fs.readFile(path.join(this.filesPath, fileName), this.readMode, async (err, data) =>{
-                    if (err) {
-                        return reject(err);
-                    }
-                    let fileContent: FileContent = JSON.parse(data)
+                    if (err) return reject(err);
 
+                    let fileContent: FileContent = JSON.parse(data)
                     fileContent = await new AddDateTreatement().treatFile(fileContent)
                     fileContent = await new ConcatMessageTreatement().treatFile(fileContent)
 
-                    console.log(fileName + ' treated');
-
-                    let writeFileCallback = (err: NodeJS.ErrnoException | null) => {
-                        if (err) throw err;
-                        console.log(fileName + ' saved');
-                        FileSystemService.deleteFile(this.filesPath, fileName);
-                    }
-
-                    FileSystemService.writeFile(
-                        JSON.stringify(fileContent, null, 2),
-                        path.join(this.filesPath, "../files_treated",fileName),
-                        writeFileCallback
-                    );  
+                    Logger.out(fileName + ' treated', OutputMode.NORMAL);
+                    
+                    this.saveTreatment(fileName, fileContent)
                 })
             }
             resolve()
         })
+    }
+
+    saveTreatment(fileName: string, fileContent: FileContent) {
+        let writeFileCallback = (err: NodeJS.ErrnoException | null) => {
+            if (err) throw err;
+            Logger.out(fileName + ' saved');
+            FileSystemService.deleteFile(this.filesPath, fileName);
+        }
+        FileSystemService.writeFile(
+            JSON.stringify(fileContent, null, 2),
+            path.join(this.filesPath, "../files_treated",fileName),
+            writeFileCallback
+        );  
     }
 
     stopWatch() {
