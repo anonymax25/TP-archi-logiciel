@@ -1,50 +1,66 @@
 import fs from "fs";
 import path from "path";
-import { FileSystemService } from "./fileSystemService"
-import { FileContent } from "../models/FileContent";
+import { FileSystemHelper } from "./FileSystemHelper"
 import { AddDateTreatement } from "../treatments/addDateTreatement";
 import { ConcatMessageTreatement } from "../treatments/concatMessageTreatement";
 import { Logger, OutputMode } from "../utils/logger";
-
-export class WatchFileService {
+import * as Zmq from "zeromq"
+import { Push } from "zeromq";
+import { WorkerManager } from "./WorkerManager";
+import { Observable } from "rxjs";
+  
+export class FileManagerService {
 
     filesPath: string
     doWatch: boolean
+
+    foundFiles: string[] = []
     
     readMode = 'utf-8'
+    workerManager: WorkerManager;
+
+    sock: Push;
+    producerListenSocket: Zmq.Pull = new Zmq.Pull;
 
     constructor(path: string = '') {
         this.filesPath = path
         this.doWatch = false
+        this.workerManager = new WorkerManager(4)
+
+        this.sock = new Zmq.Push;
+        this.sock.bind("tcp://127.0.0.1:3005").then(() => {
+            console.log("Producer bound to port 3005"); 
+            this.startWatch()
+        });  
     }
 
 
-    async startWatch() {
-        Logger.out("Start", OutputMode.PRIMARY);
+    async startWatch() {    
+        console.time('>')
+        console.timeLog('>', "Start File Watching")
         this.doWatch = true
         this.loop()
     }
 
     loop() {         
-        setTimeout(async () => { 
-            const foundFileNames: string[] = await FileSystemService.scanFiles(this.filesPath)
+        setTimeout(async () => {             
+            const foundFileNames: string[] = await FileSystemHelper.scanFiles(this.filesPath)
+            
+            for(let file of foundFileNames){
+                await this.sock.send(file)
+            }
             if(foundFileNames && foundFileNames.length > 0){
-                Logger.out(`- Found ${foundFileNames.length} files`, OutputMode.PRIMARY);
-                try {
-                    await this.applyTreatements(foundFileNames)
-                } catch (error) {
-                    Logger.out(error.message, OutputMode.ERROR)
-                }
+                console.timeLog('>', `--------- Found ${foundFileNames.length} files ---------`)
             } else {
                 Logger.out(`-`,OutputMode.PRIMARY);
             }
             if(this.doWatch)
                 this.loop()         
-        }, 3000)
+        }, 3005)
     }
 
 
-    applyTreatements(fileNames: string[]) {
+    /*applyTreatements(fileNames: string[]) {
         return new Promise((resolve, reject) => {
             for (let fileName of fileNames) {
                 fs.readFile(path.join(this.filesPath, fileName), this.readMode, async (err, data) =>{
@@ -75,6 +91,7 @@ export class WatchFileService {
             writeFileCallback
         );  
     }
+    */
 
     stopWatch() {
         this.doWatch = false

@@ -2,10 +2,9 @@ import path from "path";
 import fs from "fs";
 import { Logger } from "../utils/logger";
 
-export class FileSystemService {
+export class FileSystemHelper {
     static scanFiles(filesPath: string): Promise<string[]> {
         return new Promise((resolve, reject) => {
-            let res: string[] = []
             const directoryPath = path.join(filesPath);
             fs.readdir(directoryPath, (err, files) => {
                 if (err)
