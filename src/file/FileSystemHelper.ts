@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { Logger } from "../utils/logger";
+import { Logger } from "../utils/Logger";
 
 export class FileSystemHelper {
     static scanFiles(filesPath: string): Promise<string[]> {
@@ -14,11 +14,15 @@ export class FileSystemHelper {
         })
     }
 
-    static deleteFile(filesPath: string, fileName: string) {
-        fs.unlink(path.join(filesPath, fileName), function (err) {
-            if (err) throw err;
-            Logger.out(fileName + ' removed from watcher');
-        });
+    static async deleteFile(filesPath: string, fileName: string) {
+        return new Promise((resolve, reject) => {
+            fs.unlink(path.join(filesPath, fileName), function (err) {
+                if (err) 
+                    reject(false)
+                //Logger.out(fileName + ' removed from watcher');
+                resolve(true)
+            });
+        })
     }
 
     static writeFile(content: string, path: string, callBack: (err: NodeJS.ErrnoException | null) => void) {
