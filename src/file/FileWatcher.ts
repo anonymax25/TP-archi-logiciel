@@ -61,8 +61,8 @@ export class FileWatcher {
 
     // starts the loop sequence to watch the directory for files
     async startWatch() {
-        console.time('>')
-        console.timeLog('>', "Start File Watching")
+        
+        console.log("Start File Watching")
         this.doWatch = true
         this.loop()
     }
