@@ -2,8 +2,9 @@
 
 Maxime d'Harboullé - 4AL1 - ESGI - 2021
 ## Description
-* Look at the console output while running*  
+*Look at the console output while running*  
 
+0. Launch the app ```npm run start 3``` with the specified number of workers you want(defaults to 4 if none)
 1. The producer and workers are initialized and connect to each other  
 
 2. Will watch for files in assets/files_watcher, send them to the workers via a message queue (zeroMQ). Then the fileWatcher will recieve messages of workers when the fake treatments are completed and then remove the files from the watcher.  
@@ -18,7 +19,9 @@ Maxime d'Harboullé - 4AL1 - ESGI - 2021
 
 ## Run
 
-```npm start```
+```npm start 4``` (4 workers)
+The argument is the number of workers you want (>= 1 and defaults to 4 if not or none is found)  
+
 *App starts in index.ts*
 
 ## Example Screenshot
