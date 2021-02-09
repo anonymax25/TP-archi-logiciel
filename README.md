@@ -10,6 +10,7 @@ Maxime d'Harboullé - 4AL1 - ESGI - 2021
 
 3. Copy files in the watched directory ```./assets/test_files``` to ->```./assets/files_watcher```, and they should be processed by the workers (in logs, files are found, file is recieved by the worker and then producer recieves message that the worker finished processing the file and deletes the file)  
 
+*Note: the workers finish a task and gets a new one from the queue before the producer gets back the message from the worker syaing its done*
 
 ## Installation
 
@@ -20,3 +21,9 @@ Maxime d'Harboullé - 4AL1 - ESGI - 2021
 ```npm start```
 *App starts in index.ts*
 
+## Example Screenshot
+*Copying all test files from ```./assets/test_files``` to ->```./assets/files_watcher``` when app is running*
+
+This test is set up with 4 workers
+
+![](./assets/images/screenshot-run-example.png)
