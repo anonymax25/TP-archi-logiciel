@@ -22,11 +22,11 @@ export class FileWatcher {
     producerQueue: Push = new Push;
     workerCallbackQueue: Pull = new Pull;
 
-    constructor(path: string = '', rootPort: number) {
+    constructor(path: string = '', rootPort: number, workerCount: number = 4) {
         this.rootPort = rootPort
         this.filesPath = path
         this.doWatch = false
-        this.workerManager = new WorkerManager(4, this.rootPort)
+        this.workerManager = new WorkerManager(workerCount, this.rootPort)
 
         //bind producer to his queue
         this.producerQueue.bind(`tcp://127.0.0.1:${this.rootPort}`).then(() => {
