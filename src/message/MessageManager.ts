@@ -5,6 +5,9 @@ import { MessageType } from "./MessageType.enum";
 export class MessageManager {
 
     static async sendMessage(type: MessageType, value: string, socket: Push, worker: number = -1) {
+        if(type === MessageType.Success){
+            console.timeLog('>', `worker #${worker} finished: ${value}`)
+        }
         let message = new Message(type, value, worker)
         let messageString = JSON.stringify(message)
         await socket.send(messageString)    

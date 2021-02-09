@@ -61,7 +61,7 @@ export class FileWatcher {
 
     // starts the loop sequence to watch the directory for files
     async startWatch() {
-        
+        console.time('>')
         console.log("Start File Watching")
         this.doWatch = true
         this.loop()
@@ -102,7 +102,7 @@ export class FileWatcher {
             let message: Message = await MessageManager.waitRecieveMessage(this.workerCallbackQueue) // listen to the queues the workers signal a file has been treated
             if(message.type === MessageType.Success){
                 let treatedFileName = message.value
-                console.timeLog('>', `worker #${message.worker} treated ${treatedFileName} (${total - foundFileNames.length + 1}/${total})`)  // log that a worker has sent back the name of a finished file
+                console.timeLog('>', `producer: recieved (from worker #${message.worker}) ${treatedFileName} treated (${total - foundFileNames.length + 1}/${total})`)  // log that a worker has sent back the name of a finished file
                 await FileSystemHelper.deleteFile(this.filesPath, treatedFileName)          // remove the file that we treated from the list
                 foundFileNames = foundFileNames.filter(name => name != treatedFileName)     // remove the file that we treated from the list
             } else if(message.type === MessageType.LogInfo) {

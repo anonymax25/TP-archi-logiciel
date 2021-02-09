@@ -36,7 +36,6 @@ export class Worker {
         for await (const [fileName] of inputSock) {
             console.timeLog('>', `worker #${this.index} recieved: ${fileName}`)
             await this.fakeTreatement(fileName.toString())  //fake treatement to add delay to worker processing
- 
             MessageManager.sendMessage(MessageType.Success, fileName.toString(), this.returnToProducerSocket, this.index) //send to producer that we finished the treatement on this file    
         }
     }
